@@ -1,0 +1,38 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  labels:
+    app.kubernetes.io/name: webhook-server
+    app.kubernetes.io/part-of: podexec-defender
+  annotations:
+    service.beta.openshift.io/inject-cabundle: "true"
+  name: podexec-defender.sleshche.com
+webhooks:
+- admissionReviewVersions:
+  - v1beta1
+  clientConfig:
+    service:
+      name: webhook-server
+      namespace: podexec-defender
+      path: /validate
+      port: 443
+  failurePolicy: Fail
+  matchPolicy: Exact
+  name: webhook-server.podexec-defender.svc
+  namespaceSelector: {}
+  objectSelector:
+    matchExpressions:
+      - key: exec-defender.sleshche.com
+        operator: Exists
+  rules:
+  - apiGroups:
+    - ""
+    apiVersions:
+    - v1
+    operations:
+    - CONNECT
+    resources:
+    - pods/exec
+    scope: '*'
+  sideEffects: None
+  timeoutSeconds: 30

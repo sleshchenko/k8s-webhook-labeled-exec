@@ -1,0 +1,15 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/name: webhook-server
+    app.kubernetes.io/part-of: podexec-defender
+  name: podexec-defender
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: podexec-defender
+subjects:
+  - kind: ServiceAccount
+    name: webhook-server
+    namespace: podexec-defender

@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    # no pod/execs are allowed despite of your RBAC permissions
+    exec-defender.sleshche.com: "activated"
+  name: protected-pod
+spec:
+  containers:
+    - name: dev
+      args:
+        - tail
+        - -f
+        - /dev/null
+      image: quay.io/wto/web-terminal-tooling:latest
+      imagePullPolicy: Always
+      resources:
+        limits:
+          cpu: 500m
+          memory: 256Mi
+        requests:
+          cpu: 50m
+          memory: 256Mi

@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: webhook-server
+    app.kubernetes.io/part-of: podexec-defender
+  name: webhook-server
+  namespace: podexec-defender
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: webhook-server
+      app.kubernetes.io/part-of: podexec-defender
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: webhook-server
+        app.kubernetes.io/part-of: podexec-defender
+      name: webhook-server
+      namespace: podexec-defender
+    spec:
+      automountServiceAccountToken: true
+      serviceAccountName: webhook-server
+      containers:
+      - command:
+        - /usr/local/bin/entrypoint
+        - /usr/local/bin/podexec-defender
+        image: quay.io/sleshche/podexec-defender
+        imagePullPolicy: Always
+        name: webhook-server
+        ports:
+        - containerPort: 8443
+          name: webhook-server
+          protocol: TCP
+        volumeMounts:
+        - mountPath: /tmp/k8s-webhook-server/serving-certs
+          name: webhook-tls-certs
+          readOnly: true
+      volumes:
+      - name: webhook-tls-certs
+        secret:
+          defaultMode: 420
+          secretName: webhookserver-tls
